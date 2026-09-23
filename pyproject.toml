@@ -7,7 +7,9 @@ authors = [
     { name = "Dormouse-925" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "django>=6.1.1",
+]
 
 [project.scripts]
 tp-coo = "tp_coo:main"
