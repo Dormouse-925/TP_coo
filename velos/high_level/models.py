@@ -9,6 +9,8 @@ class Pays(models.Model):
     tva = models.FloatField()
     tarif_electrique = models.FloatField()
     salaire_minimum = models.FloatField()
+    def _str_(self):
+        return self.nom
 
 
 class Ville(models.Model):
@@ -16,6 +18,8 @@ class Ville(models.Model):
     taxe_immobiliere = models.FloatField()
     prix_m2 = models.FloatField()
     pays = models.ForeignKey(Pays, on_delete=models.CASCADE)
+    def _str_(self):
+        return self.nom
 
 
 class Machine(models.Model):
@@ -24,11 +28,15 @@ class Machine(models.Model):
     duree_de_vie = models.FloatField()
     cout_maintenance = models.FloatField()
     superficie = models.FloatField()
+    def _str_(self):
+        return self.nom
 
 
 class QuantiteMachine(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
     nombre = models.IntegerField()
+    def _str_(self):
+        return f"{self.machine.nom} {self.nombre}"
 
 
 class Lieu(models.Model):
@@ -37,6 +45,8 @@ class Lieu(models.Model):
     superficie = models.FloatField()
     quantite_machine = models.ManyToManyField(QuantiteMachine)
     consommation_electrique = models.FloatField()
+    def _str_(self):
+        return self.nom
 
 
 class Transport(models.Model):
@@ -45,6 +55,8 @@ class Transport(models.Model):
     delai = models.FloatField()
     depart = models.FloatField()
     arrivee = models.FloatField()
+    def _str_(self):
+        return f"{self.nombre_palettes} {self.depart} {self.arrivee}"
 
 
 class Produit(models.Model):
@@ -53,26 +65,36 @@ class Produit(models.Model):
     duree_de_vie = models.FloatField()
     nombre_par_palette = models.IntegerField()
     operations = models.ForeignKey(Operation, on_delete=models.CASCADE)
+    def _str_(self):
+        return self.nom
 
 
 class PrixProduit(models.Model):
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
     prix_achat = models.FloatField()
+    def _str_(self):
+        return f"{self.produit.nom} {self.prix_achat}"
 
 
 class Fournisseur(models.Model):
     nom = models.CharField(max_length=200)
     prix_produits = models.ForeignKey(PrixProduit, on_delete=models.CASCADE)
+    def _str_(self):
+        return f"{self.nom} {self.prix_produits.produit.nom} {self.prix_produits.prix_achat}"
 
 
 class QuantiteProduit(models.Model):
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
     nombre = models.IntegerField()
+    def _str_(self):
+        return f"{self.produit.nom} {self.nombre}"
 
 
 class Stock(models.Model):
     quantite_produits = models.ManyToManyField(QuantiteProduit)
     palettes_max = models.IntegerField()
+    def _str_(self):
+        return f"{self.palettes_max}"
 
 
 class PointDeVente(models.Model):
@@ -80,6 +102,8 @@ class PointDeVente(models.Model):
     lieu = models.ForeignKey(Lieu, on_delete=models.CASCADE)
     heures_de_travail = models.FloatField()
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    def _str_(self):
+        return f"{self.nom} {self.lieu.nom}"
 
 
 class Facture(models.Model):
@@ -87,6 +111,8 @@ class Facture(models.Model):
     reduction = models.FloatField()
     point_de_vente = models.ForeignKey(PointDeVente, on_delete=models.CASCADE)
     client = models.CharField(max_length=200)
+    def _str_(self):
+        return f"{self.point_de_vente.nom} {self.lieu.nom} {self.client}"
 
 
 class Operation(models.Model):
@@ -97,5 +123,6 @@ class Operation(models.Model):
     quantite_produits = models.ManyToManyField(QuantiteProduit)
     heures_de_travail = models.FloatField()
     consommation_electrique = models.FloatField()
+    def _str_(self):
+        return f"{self.nom} {self.Machine.nom} {self.heures_de_travail}"
     
-
