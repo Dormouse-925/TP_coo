@@ -64,7 +64,7 @@ class Produit(models.Model):
     prix_de_vente = models.FloatField()
     duree_de_vie = models.FloatField()
     nombre_par_palette = models.IntegerField()
-    operations = models.ForeignKey(Operation, on_delete=models.CASCADE)
+    operations = models.ForeignKey("Operation", on_delete=models.CASCADE, blank = True, null = True)
     def _str_(self):
         return self.nom
 
