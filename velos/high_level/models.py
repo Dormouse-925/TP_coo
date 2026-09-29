@@ -91,7 +91,7 @@ class Facture(models.Model):
 
 class Operation(models.Model):
     nom = models.CharField(max_length=200)
-    operation_suivante = models.ForeignKey("self", on_delete=models.CASCADE, blank = True)
+    operation_suivante = models.ForeignKey("self", on_delete=models.CASCADE, blank = True, null =True)
     cout = models.FloatField()
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
     quantite_produits = models.ManyToManyField(QuantiteProduit)
