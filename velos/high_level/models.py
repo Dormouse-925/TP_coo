@@ -37,6 +37,14 @@ class Machine(models.Model):
     def _str_(self):
         return self.nom
 
+    def costs(self):
+
+        if self.duree_de_vie <= 0:
+            return self.cout_maintenance
+
+        return (self.prix / self.duree_de_vie) + self.cout_maintenance
+
+
 
 class QuantiteMachine(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
