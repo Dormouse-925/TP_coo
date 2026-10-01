@@ -52,6 +52,9 @@ class QuantiteMachine(models.Model):
     def _str_(self):
         return f"{self.machine.nom} {self.nombre}"
 
+    def costs(self):
+        return self.nombre * self.machine.costs()
+
 
 class Lieu(models.Model):
     nom = models.CharField(max_length=200)
