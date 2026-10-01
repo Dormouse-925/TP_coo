@@ -11,6 +11,9 @@ class Pays(models.Model):
     salaire_minimum = models.FloatField()
     def _str_(self):
         return self.nom
+ 
+    def costs(self):
+        return self.tarif_electrique + self.salaire_minimum
 
 
 class Ville(models.Model):
@@ -20,6 +23,9 @@ class Ville(models.Model):
     pays = models.ForeignKey(Pays, on_delete=models.CASCADE)
     def _str_(self):
         return self.nom
+    
+    def costs(self):
+        return self.prix_m2
 
 
 class Machine(models.Model):
@@ -48,6 +54,21 @@ class Lieu(models.Model):
     def _str_(self):
         return self.nom
 
+    def costs(self):
+        
+        cout_immobilier = self.superficie * self.ville.prix_m2
+
+        cout_electricite = (
+            self.consommation_electrique * self.ville.pays.tarif_electrique
+        )
+
+        cout_machines = sum(
+            quantite.costs()
+            for quantite in self.quantite_machine.all()
+        )
+
+        return cout_immobilier + cout_electricite + cout_machines
+
 
 class Transport(models.Model):
     nombre_palettes = models.IntegerField()
@@ -58,6 +79,8 @@ class Transport(models.Model):
     def _str_(self):
         return f"{self.nombre_palettes} {self.depart} {self.arrivee}"
 
+    def costs(self):
+        return self.cout
 
 class Produit(models.Model):
     nom = models.CharField(max_length=200)
@@ -66,8 +89,22 @@ class Produit(models.Model):
     nombre_par_palette = models.IntegerField()
     operations = models.ForeignKey("Operation", on_delete=models.CASCADE, blank = True, null = True)
     def _str_(self):
-        return self.nom
+        return self.nom 
 
+
+    def costs(self):
+
+        if self.operations is None:
+            return 0
+
+        cout_total = 0
+        operation = self.operations
+
+        while operation is not None:
+            cout_total += operation.costs()
+            operation = operation.operation_suivante
+
+        return cout_total
 
 class PrixProduit(models.Model):
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
@@ -89,6 +126,9 @@ class QuantiteProduit(models.Model):
     def _str_(self):
         return f"{self.produit.nom} {self.nombre}"
 
+    def costs(self):
+        return self.nombre *self.produit.costs()
+
 
 class Stock(models.Model):
     quantite_produits = models.ManyToManyField(QuantiteProduit)
@@ -96,6 +136,11 @@ class Stock(models.Model):
     def _str_(self):
         return f"{self.palettes_max}"
 
+    def costs(self):
+        return sum(
+            quantite.costs()
+            for quantite in self.quantite_produits.all()
+        )
 
 class PointDeVente(models.Model):
     nom = models.CharField(max_length=200)
@@ -104,6 +149,13 @@ class PointDeVente(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
     def _str_(self):
         return f"{self.nom} {self.lieu.nom}"
+
+    def costs(self):
+
+        cout_MO = (
+            self.heures_de_travail * self.lieu.ville.pays.salaire_minimum
+        )
+        return self.lieu.couts() + self.stock.couts() + cout_MO
 
 
 class Facture(models.Model):
@@ -125,4 +177,12 @@ class Operation(models.Model):
     consommation_electrique = models.FloatField()
     def _str_(self):
         return f"{self.nom} {self.Machine.nom} {self.heures_de_travail}"
+
+    def costs(self):
+      
+        cout_machine = (
+            self.machine.costs() * self.heures_de_travail
+        )
+
+        return cout_machine + self.cout
     
