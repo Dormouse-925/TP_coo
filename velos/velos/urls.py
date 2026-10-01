@@ -18,6 +18,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from high_level.views import  PaysDetailView, VilleDetailView
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+
+    path(
+        "pays/<int:pk>/",
+        PaysDetailView.as_view(),
+        name="pays-detail"
+    ),
+
+    path(
+        "ville/<int:pk>/",
+        VilleDetailView.as_view(),
+        name="ville-detail"
+    ),
+
 ]

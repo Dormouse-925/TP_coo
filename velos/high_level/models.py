@@ -15,6 +15,9 @@ class Pays(models.Model):
     def costs(self):
         return self.tarif_electrique + self.salaire_minimum
 
+    def json(self): 
+        return { "id": self.id, "nom": self.nom, "tva": self.tva, "tarif_electrique": self.tarif_electrique, "salaire_minimum": self.salaire_minimum, }
+
 
 class Ville(models.Model):
     nom = models.CharField(max_length=200)
@@ -26,6 +29,9 @@ class Ville(models.Model):
     
     def costs(self):
         return self.prix_m2
+
+    def json(self):
+        return { "id": self.id, "nom": self.nom, "taxe_immobiliere": self.taxe_immobiliere, "prix_m2": self.prix_m2, "pays": self.pays.id,}
 
 
 class Machine(models.Model):
@@ -43,6 +49,8 @@ class Machine(models.Model):
             return self.cout_maintenance
 
         return (self.prix / self.duree_de_vie) + self.cout_maintenance
+
+    
 
 
 
