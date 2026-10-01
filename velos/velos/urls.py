@@ -21,9 +21,8 @@ from django.urls import path
 from high_level.views import  PaysDetailView, VilleDetailView
 
 
+ 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-
     path(
         "pays/<int:pk>/",
         PaysDetailView.as_view(),
